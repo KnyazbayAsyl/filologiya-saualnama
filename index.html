@@ -335,13 +335,46 @@ select#age option{background:#0e1430;color:var(--ink)}
     }
     el.className='save-state';
     el.innerHTML='<span class="spin"></span>Жауабыңыз сақталуда…';
-    // әр жауап — өз «basket»-і (бір-біріне кедергі келтірмейді)
-    var basket=(cfg.prefix||'resp')+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
-    var url='https://getpantry.cloud/apiv1/pantry/'+encodeURIComponent(cfg.pantry)+'/basket/'+encodeURIComponent(basket);
-    fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(rec)})
-      .then(function(r){if(!r.ok)throw new Error(r.status);
-        el.className='save-state ok';el.textContent='✓ Жауабыңыз сәтті сақталды. Қатысқаныңызға рақмет!';})
-      .catch(function(){el.className='save-state err';el.textContent='Нәтиже есептелді, бірақ сақтауда ақау болды. Интернетті тексеріп, бетті қайта ашып көріңіз.';});
+    // Барлық жауап БІР «basket»-ке, әрқайсысы бөлек кілтпен жазылады.
+    // Pantry PUT мазмұнды «deep merge» жасайды: жаңа кілт қосылады, ескілері сақталады →
+    // бір уақытта жіберілген жауаптар бірін-бірі өшірмейді, әрі оқу 1 ғана сұраныс.
+    var uid='r-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
+    var payload={}; payload[uid]=rec;
+    var url='https://getpantry.cloud/apiv1/pantry/'+encodeURIComponent(cfg.pantry)
+            +'/basket/'+encodeURIComponent(cfg.prefix||'resp');
+    var body=JSON.stringify(payload), hdr={'Content-Type':'application/json'};
+    function ok(){el.className='save-state ok';el.textContent='✓ Жауабыңыз сәтті сақталды. Қатысқаныңызға рақмет!';}
+    function fail(){el.className='save-state err';el.textContent='Нәтиже есептелді, бірақ сақтауда ақау болды. Интернет байланысын тексеріп, 10–20 секундтан соң «Қайта жіберу» түймесін басыңыз.';showRetry();}
+    // uid тұрақты болғандықтан қайта жіберу идемпотентті (сол кілт қайта жазылады, қосарланбайды).
+    function send(attempt){
+      fetch(url,{method:'PUT',headers:hdr,body:body}).then(function(r){
+        if(r.ok){ok();return;}
+        if(r.status===400){ // «basket» әлі жоқ — құру
+          fetch(url,{method:'POST',headers:hdr,body:body}).then(function(r2){
+            if(r2.ok){ok();return;}
+            if(r2.status===429&&attempt<5){retry(attempt);return;}
+            throw new Error(r2.status);
+          }).catch(function(){if(attempt<5){retry(attempt);}else{fail();}});
+          return;
+        }
+        if((r.status===429||r.status>=500)&&attempt<5){retry(attempt);return;}
+        throw new Error(r.status);
+      }).catch(function(){if(attempt<5){retry(attempt);}else{fail();}});
+    }
+    function retry(attempt){
+      el.className='save-state';
+      el.innerHTML='<span class="spin"></span>Сервер бос емес, қайта жіберілуде…';
+      setTimeout(function(){send(attempt+1);}, 1500*(attempt+1));
+    }
+    function showRetry(){
+      if(document.getElementById('retryBtn'))return;
+      var b=document.createElement('button');
+      b.id='retryBtn';b.textContent='↻ Қайта жіберу';
+      b.style.cssText='margin-top:12px;padding:10px 18px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;font-weight:700;color:#0a0f22;background:var(--grad)';
+      b.onclick=function(){b.remove();el.className='save-state';el.innerHTML='<span class="spin"></span>Жауабыңыз сақталуда…';send(0);};
+      el.parentNode.insertBefore(b, el.nextSibling);
+    }
+    send(0);
   }
 })();
 </script>

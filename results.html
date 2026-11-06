@@ -173,21 +173,27 @@ input:focus{border-color:var(--violet);box-shadow:0 0 0 4px rgba(139,123,255,.18
   function fetchAll(done){
     var cfg=window.CONFIG;
     if(!cfg.pantry){done(null,'Қойма қосылмаған (Pantry ID бос).');return;}
-    fetch(api(''),{cache:'no-store'}).then(function(r){
-      if(!r.ok)throw new Error(r.status); return r.json();
-    }).then(function(info){
-      var baskets=(info.baskets||[]).map(function(b){return b.name;})
-        .filter(function(n){return n.indexOf(cfg.prefix||'resp')===0;});
-      if(!baskets.length){done([]);return;}
-      var out=[], left=baskets.length;
-      baskets.forEach(function(name){
-        fetch(api('/basket/'+encodeURIComponent(name)),{cache:'no-store'})
-          .then(function(r){return r.ok?r.json():null;})
-          .then(function(rec){if(rec)out.push(rec);})
-          .catch(function(){})
-          .then(function(){if(--left===0)done(out);});
+    // Барлық жауап бір «basket»-те, бөлек кілтпен → БІР ғана сұраныс.
+    fetch(api('/basket/'+encodeURIComponent(cfg.prefix||'resp')),{cache:'no-store'})
+      .then(function(r){
+        if(r.status===400){return '__empty__';}            // basket әлі жоқ = жауап жоқ
+        if(r.status===429){throw new Error('429');}         // сервер шектеуі
+        if(!r.ok){throw new Error(r.status);}
+        return r.json();
+      })
+      .then(function(obj){
+        if(obj==='__empty__'){done([]);return;}
+        var out=Object.keys(obj||{}).map(function(k){return obj[k];})
+          .filter(function(v){return v&&typeof v==='object'&&v.ts;});
+        done(out);
+      })
+      .catch(function(e){
+        if(e&&e.message==='429'){
+          done(null,'Сервер қазір бос емес (тегін қызметтің шегі). Бірнеше секундтан соң «Жаңарту» түймесін басыңыз.');
+        }else{
+          done(null,'Серверге қосылу мүмкін болмады. Интернетті тексеріп, «Жаңарту» басыңыз.');
+        }
       });
-    }).catch(function(e){done(null,'Серверге қосылу мүмкін болмады.');});
   }
 
   /* ---- кіру ---- */
