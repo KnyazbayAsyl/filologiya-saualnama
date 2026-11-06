@@ -10,9 +10,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script>
 /* ===== БАПТАУ ===== */
-/* Google Apps Script "веб-қосымша" сілтемесін осында қойыңыз (нұсқаулық Code.gs ішінде). */
+/* Жауаптар Pantry (getpantry.cloud) қоймасына жазылады — Google қажет емес.
+   pantry-ге Pantry ID қойылады (нұсқаулық SETUP.txt ішінде). */
 window.CONFIG = {
-  endpoint: "", /* мыс: "https://script.google.com/macros/s/AKfyc.../exec" */
+  pantry: "",          /* Pantry ID, мыс: "a1b2c3d4-...." */
+  prefix: "fil2026"    /* әр жауап осы префикспен жеке «basket»-ке жазылады */
 };
 </script>
 <style>
@@ -144,18 +146,18 @@ select#age option{background:#0e1430;color:var(--ink)}
   <!-- ИНТРО -->
   <section class="screen on" id="s-intro">
     <div class="panel">
-      <h1>Цифрлық филология:<br><span class="grad">ресурстар мен бағдарламалар</span></h1>
-      <p class="lead">«Филологтер лингвистикалық-филологиялық ресурстар мен бағдарламалармен қаншалықты таныс?» — интерактивті тест-сауалнама. Білім корпустары, машиналық аударма, NLP, электрондық сөздіктер мен цифрлық құралдар туралы 30 сұрақ.</p>
+      <h1>Филологтердің<br><span class="grad">цифрлық сауаттылығы</span></h1>
+      <p class="lead">Бұл сауалнаманың мақсаты — филологтер мен тіл мамандарының <b>цифрлық сауаттылық</b> деңгейін, яғни заманауи сандық ресурстар, бағдарламалар мен ұғымдарды қаншалықты білетінін анықтау. Төменде <b>25 қысқа сұрақ</b> бар — әрқайсысында бір ғана дұрыс жауап.</p>
       <div class="meta-row">
-        <div class="chip"><b>30</b> сұрақ</div>
+        <div class="chip"><b>25</b> сұрақ</div>
         <div class="chip"><b>5</b> жауап нұсқасы</div>
-        <div class="chip">≈ <b>7</b> минут</div>
-        <div class="chip">Соңында <b>нәтиже</b> көрсетіледі</div>
+        <div class="chip">≈ <b>6</b> минут</div>
+        <div class="chip">Соңында <b>деңгейіңіз</b> көрсетіледі</div>
       </div>
       <div class="row2">
         <div class="col-name">
           <label class="fld" for="fio">Аты-жөніңіз</label>
-          <input type="text" id="fio" autocomplete="name" placeholder="Мысалы: Айгерім Сейтқалиева" maxlength="80">
+          <input type="text" id="fio" autocomplete="name" placeholder="Аты-жөніңіз" maxlength="80">
         </div>
         <div class="col-age">
           <label class="fld" for="age">Жасыңыз</label>
@@ -181,7 +183,7 @@ select#age option{background:#0e1430;color:var(--ink)}
     <div class="panel">
       <div class="progress">
         <div class="bar"><i id="pbar"></i></div>
-        <div class="counter"><span id="cur">1</span> / 30</div>
+        <div class="counter"><span id="cur">1</span> / <span id="tot">25</span></div>
       </div>
       <div class="qnum" id="qnum">01-сұрақ</div>
       <h2 class="qtext" id="qtext">—</h2>
@@ -208,7 +210,7 @@ select#age option{background:#0e1430;color:var(--ink)}
             <circle id="ringfg" cx="100" cy="100" r="86" fill="none" stroke="url(#g)" stroke-width="16"
               stroke-linecap="round" stroke-dasharray="540" stroke-dashoffset="540"/>
           </svg>
-          <div class="val"><div class="num" id="score">0</div><div class="of">30 сұрақтан</div></div>
+          <div class="val"><div class="num" id="score">0</div><div class="of"><span id="ofN">25</span> сұрақтан</div></div>
         </div>
       </div>
       <div class="level" id="level">—</div>
@@ -226,6 +228,8 @@ select#age option{background:#0e1430;color:var(--ink)}
   var S = window.SURVEY.questions, N = S.length;
   var answers = new Array(N).fill(null);
   var idx = 0, fio = "", age = "";
+  var totEl=document.getElementById('tot'); if(totEl)totEl.textContent=N;
+  var ofEl=document.getElementById('ofN'); if(ofEl)ofEl.textContent=N;
 
   // жүзетін глифтер
   (function(){
@@ -322,22 +326,21 @@ select#age option{background:#0e1430;color:var(--ink)}
 
   function submit(s,pct){
     var el=document.getElementById('save');
-    var payload={
-      name:fio, age:age, score:String(s), total:String(N), percent:String(pct),
-      answers:JSON.stringify(answers), ts:new Date().toISOString()
-    };
-    if(!window.CONFIG||!window.CONFIG.endpoint){
+    var cfg=window.CONFIG||{};
+    var rec={name:fio, age:age, score:s, total:N, percent:pct, answers:answers, ts:new Date().toISOString()};
+    if(!cfg.pantry){
       el.className='save-state err';
       el.textContent='Нәтиже есептелді (сервер әлі қосылмаған).';
       return;
     }
     el.className='save-state';
     el.innerHTML='<span class="spin"></span>Жауабыңыз сақталуда…';
-    var body=Object.keys(payload).map(function(k){
-      return encodeURIComponent(k)+'='+encodeURIComponent(payload[k]);}).join('&');
-    fetch(window.CONFIG.endpoint,{method:'POST',mode:'no-cors',
-      headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:body})
-      .then(function(){el.className='save-state ok';el.textContent='✓ Жауабыңыз сәтті сақталды. Қатысқаныңызға рақмет!';})
+    // әр жауап — өз «basket»-і (бір-біріне кедергі келтірмейді)
+    var basket=(cfg.prefix||'resp')+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
+    var url='https://getpantry.cloud/apiv1/pantry/'+encodeURIComponent(cfg.pantry)+'/basket/'+encodeURIComponent(basket);
+    fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(rec)})
+      .then(function(r){if(!r.ok)throw new Error(r.status);
+        el.className='save-state ok';el.textContent='✓ Жауабыңыз сәтті сақталды. Қатысқаныңызға рақмет!';})
       .catch(function(){el.className='save-state err';el.textContent='Нәтиже есептелді, бірақ сақтауда ақау болды. Интернетті тексеріп, бетті қайта ашып көріңіз.';});
   }
 })();

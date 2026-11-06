@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-06T09:01:12.894Z",
+        "reason": "model: intentional neon/aurora academic theme, not contrast/a11y issue"
+      },
+      {
+        "rule": "clipped-overflow-container",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-06T09:01:12.910Z",
+        "reason": "model: #glyphs particle layer is meant to be clipped by the viewport"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "results.html"
+        ],
+        "createdAt": "2026-11-06T09:04:01.748Z",
+        "reason": "model: same intentional neon-academic theme as index.html"
+      }
+    ]
+  }
+}
