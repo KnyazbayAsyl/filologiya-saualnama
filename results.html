@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Нәтижелер — цифрлық филология сауалнамасы</title>
+<meta name="description" content="Сауалнама нәтижелерінің жабық дашборды.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+/* ===== БАПТАУ (index.html-дегімен бірдей болсын) ===== */
+window.CONFIG = {
+  endpoint: "", /* Google Apps Script "exec" сілтемесі */
+  key: ""       /* Code.gs ішіндегі SECRET-пен бірдей болуы керек */
+};
+</script>
+<style>
+:root{
+  --bg:#0b1020; --ink:#eef2ff; --muted:#aab4d6;
+  --card:rgba(21,28,56,.62); --stroke:rgba(140,160,230,.18);
+  --cyan:#35e9d6; --violet:#8b7bff; --gold:#f6c96b; --good:#3ddc97; --bad:#ff6b7d;
+  --radius:20px; --grad:linear-gradient(120deg,var(--violet),var(--cyan));
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Manrope",system-ui,sans-serif;color:var(--ink);background:var(--bg);min-height:100dvh;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(1100px 650px at 85% -10%,rgba(139,123,255,.16),transparent 60%),
+             radial-gradient(900px 600px at -10% 110%,rgba(53,233,214,.12),transparent 60%)}
+.wrap{max-width:1040px;margin:0 auto;padding:clamp(18px,4vw,40px) 18px 80px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--stroke);border-radius:999px;background:rgba(18,24,50,.5);font-size:13px;font-weight:600;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--grad)}
+h1{font-family:"Spectral",serif;font-weight:700;font-size:clamp(26px,5vw,40px);margin:.4em 0 .1em}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);margin:.2em 0 1.6em;font-size:15.5px}
+.panel{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);padding:clamp(18px,3vw,28px);backdrop-filter:blur(14px);box-shadow:0 30px 70px -45px rgba(0,0,0,.8)}
+.center{max-width:460px;margin:9vh auto 0;text-align:center}
+label.fld{display:block;margin:0 0 7px;font-weight:600;font-size:14px;color:var(--muted);text-align:left}
+input{width:100%;padding:15px 16px;border-radius:14px;border:1px solid var(--stroke);background:rgba(10,14,32,.65);color:var(--ink);font-size:16px;font-family:inherit;outline:none;transition:.2s}
+input:focus{border-color:var(--violet);box-shadow:0 0 0 4px rgba(139,123,255,.18)}
+.btn{appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:700;font-size:16px;color:#0a0f22;background:var(--grad);padding:15px 26px;border-radius:14px;width:100%;transition:transform .15s;box-shadow:0 16px 30px -18px rgba(53,233,214,.45)}
+.btn:hover{transform:translateY(-2px)}
+.btn.sm{width:auto;padding:11px 18px;font-size:14px}
+.msg{min-height:22px;margin-top:14px;font-size:14px;color:var(--gold)}
+.hidden{display:none}
+
+.topbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:22px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:18px 20px}
+.kpi .n{font-family:"Spectral",serif;font-weight:700;font-size:34px;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.kpi .l{color:var(--muted);font-size:13px;margin-top:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.panel h3{font-family:"Spectral",serif;font-weight:600;font-size:18px;margin:0 0 16px}
+
+.barrow{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:13.5px}
+.barrow .cap{flex:0 0 80px;color:var(--muted);white-space:nowrap}
+.barrow .track{flex:1;height:14px;background:rgba(10,14,32,.7);border-radius:999px;overflow:hidden;border:1px solid var(--stroke)}
+.barrow .fill{height:100%;border-radius:999px;background:var(--grad);width:0;transition:width .8s cubic-bezier(.2,.7,.2,1)}
+.barrow .vv{flex:0 0 46px;text-align:right;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+
+.qlist{max-height:430px;overflow:auto}
+.qitem{padding:11px 0;border-bottom:1px solid var(--stroke)}
+.qitem:last-child{border-bottom:0}
+.qitem .qt{font-size:13.5px;margin-bottom:7px;color:var(--ink)}
+.qitem .mini{display:flex;align-items:center;gap:10px}
+.qitem .track{flex:1;height:10px;background:rgba(10,14,32,.7);border-radius:999px;overflow:hidden;border:1px solid var(--stroke)}
+.qitem .fill{height:100%;border-radius:999px;width:0;transition:width .8s}
+.qitem .pc{flex:0 0 54px;text-align:right;font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--stroke)}
+th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0;background:#141a34}
+td.sc{font-weight:700;font-variant-numeric:tabular-nums}
+.tablewrap{max-height:520px;overflow:auto;border-radius:14px;border:1px solid var(--stroke)}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700}
+.p-hi{background:rgba(61,220,151,.16);color:var(--good)}
+.p-mid{background:rgba(246,201,107,.16);color:var(--gold)}
+.p-lo{background:rgba(255,107,125,.16);color:var(--bad)}
+.foot{margin-top:26px;text-align:center;color:var(--muted);font-size:12.5px;opacity:.85}
+.empty{text-align:center;color:var(--muted);padding:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- КІЛТ -->
+  <section id="gate" class="center">
+    <div class="badge"><span class="dot"></span> Жабық дашборд</div>
+    <h1>Сауалнама <span class="grad">нәтижелері</span></h1>
+    <p class="sub">Нәтижелерді көру үшін құпия кілтті енгізіңіз.</p>
+    <div class="panel">
+      <label class="fld" for="key">Құпия кілт</label>
+      <input type="password" id="key" placeholder="••••••••" autocomplete="off">
+      <div style="height:14px"></div>
+      <button class="btn" id="enter">Кіру →</button>
+      <div class="msg" id="gmsg"></div>
+    </div>
+  </section>
+
+  <!-- ДАШБОРД -->
+  <section id="dash" class="hidden">
+    <div class="topbar">
+      <div>
+        <div class="badge"><span class="dot"></span> Цифрлық филология сауалнамасы</div>
+        <h1 style="margin-bottom:4px">Нәтижелер <span class="grad">дашборды</span></h1>
+      </div>
+      <button class="btn sm" id="refresh">↻ Жаңарту</button>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="grid2">
+      <div class="panel">
+        <h3>Ұпай бойынша таралу</h3>
+        <div id="dist"></div>
+      </div>
+      <div class="panel">
+        <h3>Жас бойынша таралу</h3>
+        <div id="agedist"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:22px">
+      <h3>Сұрақтар бойынша дұрыс жауап пайызы</h3>
+      <div class="qlist" id="qstats"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Қатысушылар</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>#</th><th>Аты-жөні</th><th>Жасы</th><th>Ұпай</th><th>%</th><th>Күні</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="foot">Бұл бет тек сізге арналған. Сілтемені немесе кілтті бөтен адамдарға бермеңіз.</p>
+  </section>
+</div>
+
+<script src="questions.js"></script>
+<script>
+(function(){
+  "use strict";
+  var Q=window.SURVEY.questions;
+
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+  function pct(n,d){return d?Math.round(n/d*100):0;}
+
+  function jsonp(cb){
+    var el=document.getElementById('gmsg');
+    if(!window.CONFIG||!window.CONFIG.endpoint){cb({error:'Сервер қосылмаған (endpoint бос).'});return;}
+    var name='__cb'+Date.now();
+    window[name]=function(data){cb(data);delete window[name];s.remove();};
+    var s=document.createElement('script');
+    s.src=window.CONFIG.endpoint+'?key='+encodeURIComponent(window.CONFIG.key||'')+
+          '&callback='+name+'&_='+Date.now();
+    s.onerror=function(){cb({error:'Серверге қосылу мүмкін болмады.'});s.remove();};
+    document.body.appendChild(s);
+  }
+
+  function enter(){
+    var k=document.getElementById('key').value.trim();
+    window.CONFIG.key=k;
+    document.getElementById('gmsg').textContent='Тексерілуде…';
+    load(function(ok,err){
+      if(ok){document.getElementById('gate').classList.add('hidden');
+        document.getElementById('dash').classList.remove('hidden');
+        try{sessionStorage.setItem('dashkey',k);}catch(e){}}
+      else document.getElementById('gmsg').textContent=err||'Кілт қате.';
+    });
+  }
+
+  function load(done){
+    jsonp(function(data){
+      if(!data||data.error){if(done)done(false,data&&data.error);return;}
+      if(!data.ok){if(done)done(false,'Құпия кілт қате.');return;}
+      render(data.rows||[]);
+      if(done)done(true);
+    });
+  }
+
+  function band(p){return p>=85?'p-hi':p>=55?'p-mid':'p-lo';}
+
+  function render(rows){
+    var N=Q.length, n=rows.length;
+    // KPI
+    var sumPct=0, best=0;
+    rows.forEach(function(r){var p=+r.percent||0;sumPct+=p;if(p>best)best=p;});
+    var avg=n?Math.round(sumPct/n):0;
+    document.getElementById('kpis').innerHTML=
+      kpi(n,'қатысушы')+kpi(avg+'%','орташа нәтиже')+
+      kpi((n?(sumPct/n/100*N).toFixed(1):'0')+' / '+N,'орташа ұпай')+kpi(best+'%','ең жоғары');
+
+    // ұпай таралуы (0-39,40-59,60-79,80-100)
+    var bins=[['0–39%',0],['40–59%',0],['60–79%',0],['80–100%',0]];
+    rows.forEach(function(r){var p=+r.percent||0;
+      bins[p>=80?3:p>=60?2:p>=40?1:0][1]++;});
+    document.getElementById('dist').innerHTML=bins.map(function(b){
+      return bar(b[0],b[1],n);}).join('')||empty();
+
+    // жас таралуы
+    var ages={}; rows.forEach(function(r){var a=r.age||'—';ages[a]=(ages[a]||0)+1;});
+    var order=['18–24','25–34','35–44','45–54','55+','—'];
+    var akeys=Object.keys(ages).sort(function(a,b){return order.indexOf(a)-order.indexOf(b);});
+    document.getElementById('agedist').innerHTML=akeys.map(function(a){
+      return bar(a,ages[a],n);}).join('')||empty();
+
+    // сұрақ статистикасы
+    var correct=new Array(N).fill(0), answered=new Array(N).fill(0);
+    rows.forEach(function(r){
+      var ans; try{ans=JSON.parse(r.answers);}catch(e){ans=null;}
+      if(!ans)return;
+      for(var i=0;i<N;i++){if(ans[i]!=null){answered[i]++;if(ans[i]===Q[i].a)correct[i]++;}}
+    });
+    document.getElementById('qstats').innerHTML=Q.map(function(q,i){
+      var p=pct(correct[i],answered[i]);
+      return '<div class="qitem"><div class="qt">'+(i+1)+'. '+esc(q.q)+'</div>'+
+        '<div class="mini"><div class="track"><div class="fill" style="background:var(--grad)" data-w="'+p+'"></div></div>'+
+        '<div class="pc" style="color:var(--ink)">'+p+'%</div></div></div>';
+    }).join('')||empty();
+
+    // кесте (жаңалары жоғарыда)
+    var sorted=rows.slice().sort(function(a,b){return (b.ts||'').localeCompare(a.ts||'');});
+    document.getElementById('tbody').innerHTML=sorted.map(function(r,i){
+      var p=+r.percent||0, d=r.ts?new Date(r.ts):null;
+      var ds=d&&!isNaN(d)?d.toLocaleDateString('kk-KZ')+' '+d.toLocaleTimeString('kk-KZ',{hour:'2-digit',minute:'2-digit'}):'—';
+      return '<tr><td>'+(i+1)+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.age||'—')+
+        '</td><td class="sc">'+esc(r.score)+' / '+esc(r.total||N)+
+        '</td><td><span class="pill '+band(p)+'">'+p+'%</span></td><td>'+ds+'</td></tr>';
+    }).join('')||'<tr><td colspan="6" class="empty">Әзірге жауап жоқ.</td></tr>';
+
+    // анимация
+    requestAnimationFrame(function(){
+      document.querySelectorAll('.fill[data-w]').forEach(function(f){f.style.width=f.getAttribute('data-w')+'%';});
+    });
+  }
+  function kpi(n,l){return '<div class="kpi"><div class="n">'+esc(n)+'</div><div class="l">'+esc(l)+'</div></div>';}
+  function bar(cap,v,tot){var p=pct(v,tot);
+    return '<div class="barrow"><div class="cap">'+esc(cap)+'</div>'+
+      '<div class="track"><div class="fill" data-w="'+p+'"></div></div>'+
+      '<div class="vv">'+v+'</div></div>';}
+  function empty(){return '<div class="empty">Әзірге дерек жоқ.</div>';}
+
+  document.getElementById('enter').addEventListener('click',enter);
+  document.getElementById('key').addEventListener('keydown',function(e){if(e.key==='Enter')enter();});
+  document.getElementById('refresh').addEventListener('click',function(){load();});
+  // сессияда сақталған кілтпен автокіру
+  try{var sk=sessionStorage.getItem('dashkey');if(sk){document.getElementById('key').value=sk;enter();}}catch(e){}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Цифрлық филология — сауалнама</title>
+<meta name="description" content="Филологтер лингвистикалық-филологиялық ресурстар мен бағдарламалармен қаншалықты таныс? — интерактивті тест-сауалнама.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+/* ===== БАПТАУ ===== */
+/* Google Apps Script "веб-қосымша" сілтемесін осында қойыңыз (нұсқаулық Code.gs ішінде). */
+window.CONFIG = {
+  endpoint: "", /* мыс: "https://script.google.com/macros/s/AKfyc.../exec" */
+};
+</script>
+<style>
+:root{
+  --bg:#0b1020; --bg2:#0e1430; --ink:#eef2ff; --muted:#aab4d6;
+  --card:rgba(21,28,56,.62); --stroke:rgba(140,160,230,.18);
+  --cyan:#35e9d6; --violet:#8b7bff; --gold:#f6c96b; --pink:#ff7bbf;
+  --good:#3ddc97; --bad:#ff6b7d;
+  --radius:22px; --maxw:720px;
+  --grad:linear-gradient(120deg,var(--violet),var(--cyan));
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color:var(--ink); background:var(--bg);
+  min-height:100dvh; line-height:1.55; overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+/* ---- аурора фон ---- */
+.aurora{position:fixed; inset:-20% -10%; z-index:-3; filter:blur(70px); opacity:.55; pointer-events:none}
+.aurora span{position:absolute; width:46vw; height:46vw; border-radius:50%; mix-blend-mode:screen; animation:float 20s ease-in-out infinite}
+.aurora .a{background:#6d59ff; top:-6%; left:-6%}
+.aurora .b{background:#17c7bd; bottom:-10%; right:-6%; animation-delay:-7s}
+.aurora .c{background:#ff5fa2; top:30%; right:20%; width:32vw;height:32vw; animation-delay:-13s; opacity:.7}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(4%,6%) scale(1.08)}66%{transform:translate(-5%,-3%) scale(.95)}}
+body::before{content:"";position:fixed;inset:0;z-index:-2;
+  background:radial-gradient(1200px 700px at 80% -10%,rgba(139,123,255,.18),transparent 60%),
+             radial-gradient(900px 600px at -10% 110%,rgba(53,233,214,.14),transparent 60%);}
+/* ---- жүзетін глифтер ---- */
+#glyphs{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+#glyphs b{position:absolute;font-family:"Spectral",serif;font-weight:700;color:rgba(170,185,235,.10);
+  animation:rise linear infinite;user-select:none}
+@keyframes rise{from{transform:translateY(110vh) rotate(0)}to{transform:translateY(-20vh) rotate(360deg)}}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:clamp(18px,4vw,40px) 18px 80px;min-height:100dvh;display:flex;flex-direction:column}
+.badge{display:inline-flex;align-items:center;gap:8px;align-self:center;
+  padding:7px 14px;border:1px solid var(--stroke);border-radius:999px;background:rgba(18,24,50,.5);
+  font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.3px;backdrop-filter:blur(8px)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--grad);box-shadow:0 0 7px rgba(53,233,214,.5)}
+
+/* ---- панель ---- */
+.panel{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);
+  padding:clamp(22px,4.5vw,40px);backdrop-filter:blur(16px);
+  box-shadow:0 30px 80px -40px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.05);}
+.screen{display:none;animation:in .5s cubic-bezier(.2,.7,.2,1)}
+.screen.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+h1{font-family:"Spectral",serif;font-weight:700;line-height:1.12;margin:.3em 0 .2em;
+  font-size:clamp(28px,6.4vw,46px);letter-spacing:-.5px}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--muted);font-size:clamp(15px,2.2vw,17.5px);margin:.2em 0 1.4em}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 26px}
+.chip{font-size:13px;color:var(--muted);border:1px solid var(--stroke);border-radius:12px;padding:8px 12px;background:rgba(15,20,44,.5)}
+.chip b{color:var(--ink);font-weight:700}
+
+label.fld{display:block;margin:0 0 7px;font-weight:600;font-size:14px;color:var(--muted)}
+input[type=text]{width:100%;padding:15px 16px;border-radius:14px;border:1px solid var(--stroke);
+  background:rgba(10,14,32,.65);color:var(--ink);font-size:16px;font-family:inherit;outline:none;transition:.2s}
+input[type=text]:focus{border-color:var(--violet);box-shadow:0 0 0 4px rgba(139,123,255,.18)}
+.row2{display:flex;gap:14px;align-items:flex-start}
+.col-name{flex:1 1 auto;min-width:0}
+.col-age{flex:0 0 150px}
+select#age{width:100%;padding:15px 16px;border-radius:14px;border:1px solid var(--stroke);
+  background:rgba(10,14,32,.65);color:var(--ink);font-size:16px;font-family:inherit;outline:none;transition:.2s;
+  -webkit-appearance:none;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23aab4d6' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center}
+select#age:focus{border-color:var(--violet);box-shadow:0 0 0 4px rgba(139,123,255,.18)}
+select#age option{background:#0e1430;color:var(--ink)}
+@media (max-width:460px){.row2{flex-direction:column;gap:14px}.col-age{flex:1 1 auto;width:100%}}
+.hint{font-size:12.5px;color:var(--muted);margin:8px 2px 0;opacity:.85}
+
+.btn{appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:700;font-size:16px;
+  color:#0a0f22;background:var(--grad);padding:15px 26px;border-radius:14px;width:100%;
+  box-shadow:0 16px 30px -18px rgba(53,233,214,.45);transition:transform .15s,box-shadow .2s,filter .2s;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 22px 40px -20px rgba(139,123,255,.5)}
+.btn:active{transform:translateY(0)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;filter:grayscale(.3);transform:none}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--stroke);box-shadow:none;width:auto;padding:13px 20px;font-weight:600}
+.btn.ghost:hover{color:var(--ink);border-color:var(--violet);transform:none}
+
+/* ---- прогресс ---- */
+.progress{display:flex;align-items:center;gap:14px;margin:0 0 22px}
+.bar{flex:1;height:9px;border-radius:999px;background:rgba(10,14,32,.7);overflow:hidden;border:1px solid var(--stroke)}
+.bar i{display:block;height:100%;width:0;border-radius:999px;background:var(--grad);transition:width .45s cubic-bezier(.2,.7,.2,1)}
+.counter{font-size:13.5px;font-weight:700;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.qnum{font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan);margin-bottom:8px}
+.qtext{font-family:"Spectral",serif;font-weight:600;font-size:clamp(20px,3.6vw,26px);line-height:1.3;margin:0 0 22px}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt{display:flex;align-items:flex-start;gap:13px;padding:15px 16px;border-radius:15px;cursor:pointer;
+  border:1px solid var(--stroke);background:rgba(12,17,38,.5);transition:.17s;user-select:none}
+.opt:hover{border-color:var(--violet);background:rgba(24,30,62,.7);transform:translateX(3px)}
+.opt.sel{border-color:var(--cyan);background:rgba(53,233,214,.12);box-shadow:0 0 0 3px rgba(53,233,214,.14)}
+.mark{flex:none;width:26px;height:26px;border-radius:8px;border:1.5px solid var(--stroke);
+  display:grid;place-items:center;font-weight:800;font-size:13px;color:var(--muted);transition:.17s;background:rgba(10,14,32,.5)}
+.opt.sel .mark{background:var(--grad);color:#0a0f22;border-color:transparent}
+.opt span.txt{font-size:15.5px;padding-top:2px}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
+
+/* ---- нәтиже ---- */
+.ring-wrap{display:flex;flex-direction:column;align-items:center;margin:6px 0 10px}
+.ring{position:relative;width:200px;height:200px}
+.ring svg{transform:rotate(-90deg)}
+.ring .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .num{font-family:"Spectral",serif;font-weight:700;font-size:52px;line-height:1}
+.ring .of{font-size:14px;color:var(--muted);margin-top:4px;letter-spacing:1px}
+.level{text-align:center;font-weight:800;font-size:22px;margin:14px 0 4px}
+.levdesc{text-align:center;color:var(--muted);max-width:460px;margin:0 auto 10px;font-size:15px}
+.save-state{text-align:center;font-size:14px;margin-top:18px;min-height:22px;color:var(--muted)}
+.save-state.ok{color:var(--good)}
+.save-state.err{color:var(--gold)}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.25);border-top-color:var(--cyan);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.foot{margin-top:auto;padding-top:26px;text-align:center;color:var(--muted);font-size:12.5px;opacity:.8}
+.err-field{border-color:var(--bad)!important;box-shadow:0 0 0 4px rgba(255,107,125,.18)!important}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.08s!important}.aurora span{animation:none}#glyphs{display:none}}
+</style>
+</head>
+<body>
+<div class="aurora"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+<div id="glyphs" aria-hidden="true"></div>
+
+<div class="wrap">
+  <div class="badge"><span class="dot"></span> әл-Фараби ат. ҚазҰУ · Қолданбалы қазақ тіл білімі</div>
+
+  <!-- ИНТРО -->
+  <section class="screen on" id="s-intro">
+    <div class="panel">
+      <h1>Цифрлық филология:<br><span class="grad">ресурстар мен бағдарламалар</span></h1>
+      <p class="lead">«Филологтер лингвистикалық-филологиялық ресурстар мен бағдарламалармен қаншалықты таныс?» — интерактивті тест-сауалнама. Білім корпустары, машиналық аударма, NLP, электрондық сөздіктер мен цифрлық құралдар туралы 30 сұрақ.</p>
+      <div class="meta-row">
+        <div class="chip"><b>30</b> сұрақ</div>
+        <div class="chip"><b>5</b> жауап нұсқасы</div>
+        <div class="chip">≈ <b>7</b> минут</div>
+        <div class="chip">Соңында <b>нәтиже</b> көрсетіледі</div>
+      </div>
+      <div class="row2">
+        <div class="col-name">
+          <label class="fld" for="fio">Аты-жөніңіз</label>
+          <input type="text" id="fio" autocomplete="name" placeholder="Мысалы: Айгерім Сейтқалиева" maxlength="80">
+        </div>
+        <div class="col-age">
+          <label class="fld" for="age">Жасыңыз</label>
+          <select id="age">
+            <option value="" disabled selected>Таңдаңыз</option>
+            <option value="18–24">18–24</option>
+            <option value="25–34">25–34</option>
+            <option value="35–44">35–44</option>
+            <option value="45–54">45–54</option>
+            <option value="55+">55+</option>
+          </select>
+        </div>
+      </div>
+      <p class="hint">Аты-жөніңіз бен жасыңыз тек зерттеу нәтижелерін есепке алу үшін қажет.</p>
+      <div style="height:20px"></div>
+      <button class="btn" id="start">Тестті бастау →</button>
+    </div>
+    <p class="foot">Жауаптарыңыз ғылыми зерттеу (МӨЖ) мақсатында ғана пайдаланылады.</p>
+  </section>
+
+  <!-- ТЕСТ -->
+  <section class="screen" id="s-quiz">
+    <div class="panel">
+      <div class="progress">
+        <div class="bar"><i id="pbar"></i></div>
+        <div class="counter"><span id="cur">1</span> / 30</div>
+      </div>
+      <div class="qnum" id="qnum">01-сұрақ</div>
+      <h2 class="qtext" id="qtext">—</h2>
+      <div class="opts" id="opts"></div>
+      <div class="nav">
+        <button class="btn ghost" id="prev">← Артқа</button>
+        <button class="btn" id="next" style="max-width:220px" disabled>Келесі →</button>
+      </div>
+    </div>
+    <p class="foot">Бір сұрақта бір ғана жауап белгілеңіз.</p>
+  </section>
+
+  <!-- НӘТИЖЕ -->
+  <section class="screen" id="s-done">
+    <div class="panel" style="text-align:center">
+      <div class="qnum" style="color:var(--gold)">Нәтижеңіз</div>
+      <h1 style="margin-bottom:10px">Рақмет, <span class="grad" id="who">филолог</span>!</h1>
+      <div class="ring-wrap">
+        <div class="ring">
+          <svg width="200" height="200" viewBox="0 0 200 200">
+            <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#8b7bff"/><stop offset="1" stop-color="#35e9d6"/></linearGradient></defs>
+            <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(140,160,230,.15)" stroke-width="16"/>
+            <circle id="ringfg" cx="100" cy="100" r="86" fill="none" stroke="url(#g)" stroke-width="16"
+              stroke-linecap="round" stroke-dasharray="540" stroke-dashoffset="540"/>
+          </svg>
+          <div class="val"><div class="num" id="score">0</div><div class="of">30 сұрақтан</div></div>
+        </div>
+      </div>
+      <div class="level" id="level">—</div>
+      <p class="levdesc" id="leveldesc"></p>
+      <div class="save-state" id="save"></div>
+    </div>
+    <p class="foot">Жауабыңыз сақталды. Бұл бетті жабуға болады.</p>
+  </section>
+</div>
+
+<script src="questions.js"></script>
+<script>
+(function(){
+  "use strict";
+  var S = window.SURVEY.questions, N = S.length;
+  var answers = new Array(N).fill(null);
+  var idx = 0, fio = "", age = "";
+
+  // жүзетін глифтер
+  (function(){
+    var box=document.getElementById('glyphs'), g="ӘҚҢӨҰҮҺІ01{}</>#АаБв".split("");
+    for(var i=0;i<16;i++){var b=document.createElement('b');
+      b.textContent=g[Math.floor(Math.random()*g.length)];
+      b.style.left=(Math.random()*100)+'vw';
+      b.style.fontSize=(18+Math.random()*44)+'px';
+      b.style.animationDuration=(16+Math.random()*22)+'s';
+      b.style.animationDelay=(-Math.random()*30)+'s';
+      box.appendChild(b);}
+  })();
+
+  function show(id){
+    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on')});
+    document.getElementById(id).classList.add('on');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  var fioEl=document.getElementById('fio'), ageEl=document.getElementById('age');
+  document.getElementById('start').addEventListener('click',function(){
+    fio=fioEl.value.trim(); age=ageEl.value;
+    if(fio.length<2){fioEl.classList.add('err-field');fioEl.focus();
+      setTimeout(function(){fioEl.classList.remove('err-field')},1600);return;}
+    if(!age){ageEl.classList.add('err-field');ageEl.focus();
+      setTimeout(function(){ageEl.classList.remove('err-field')},1600);return;}
+    document.getElementById('who').textContent=fio.split(/\s+/)[0]||fio;
+    idx=0; render(); show('s-quiz');
+  });
+  fioEl.addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('start').click();});
+
+  var optsEl=document.getElementById('opts');
+  function render(){
+    var q=S[idx];
+    document.getElementById('cur').textContent=idx+1;
+    document.getElementById('qnum').textContent=String(idx+1).padStart(2,'0')+'-сұрақ';
+    document.getElementById('qtext').textContent=q.q;
+    document.getElementById('pbar').style.width=((idx)/N*100)+'%';
+    optsEl.innerHTML='';
+    q.o.forEach(function(text,i){
+      var d=document.createElement('div');
+      d.className='opt'+(answers[idx]===i?' sel':'');
+      d.innerHTML='<span class="mark">'+String.fromCharCode(65+i)+'</span><span class="txt"></span>';
+      d.querySelector('.txt').textContent=text;
+      d.addEventListener('click',function(){
+        answers[idx]=i;
+        optsEl.querySelectorAll('.opt').forEach(function(o){o.classList.remove('sel')});
+        d.classList.add('sel');
+        document.getElementById('next').disabled=false;
+      });
+      optsEl.appendChild(d);
+    });
+    document.getElementById('prev').style.visibility=idx===0?'hidden':'visible';
+    document.getElementById('next').disabled=answers[idx]===null;
+    document.getElementById('next').textContent=(idx===N-1)?'Аяқтау ✓':'Келесі →';
+  }
+
+  document.getElementById('prev').addEventListener('click',function(){
+    if(idx>0){idx--;render();}
+  });
+  document.getElementById('next').addEventListener('click',function(){
+    if(answers[idx]===null)return;
+    if(idx<N-1){idx++;render();}
+    else finish();
+  });
+
+  function score(){var s=0;for(var i=0;i<N;i++)if(answers[i]===S[i].a)s++;return s;}
+
+  function band(pct){
+    if(pct>=85)return["Жоғары деңгей","Цифрлық ресурстар мен құралдарды жетік білесіз. Тамаша нәтиже!"];
+    if(pct>=65)return["Жақсы деңгей","Негізгі ресурстармен жақсы таныссыз, кейбір бағыттарды тереңдетуге болады."];
+    if(pct>=45)return["Орташа деңгей","Базалық түсінік бар. Корпус, NLP және электрондық сөздіктермен көбірек жұмыс істеу пайдалы."];
+    return["Бастапқы деңгей","Цифрлық филология құралдарымен әлі таныса түсу керек — бұл дамуға жақсы бастама."];
+  }
+
+  function finish(){
+    var s=score(), pct=Math.round(s/N*100), b=band(pct);
+    show('s-done');
+    document.getElementById('level').textContent=b[0];
+    document.getElementById('leveldesc').textContent=b[1];
+    // сақина мен санды анимациялау
+    var ring=document.getElementById('ringfg'), C=2*Math.PI*86;
+    ring.setAttribute('stroke-dasharray',C);
+    ring.setAttribute('stroke-dashoffset',C);
+    var numEl=document.getElementById('score'), t0=null, dur=1100;
+    requestAnimationFrame(function step(ts){
+      if(!t0)t0=ts; var p=Math.min((ts-t0)/dur,1), e=1-Math.pow(1-p,3);
+      numEl.textContent=Math.round(e*s);
+      ring.setAttribute('stroke-dashoffset',C-C*(s/N)*e);
+      if(p<1)requestAnimationFrame(step);
+    });
+    submit(s,pct);
+  }
+
+  function submit(s,pct){
+    var el=document.getElementById('save');
+    var payload={
+      name:fio, age:age, score:String(s), total:String(N), percent:String(pct),
+      answers:JSON.stringify(answers), ts:new Date().toISOString()
+    };
+    if(!window.CONFIG||!window.CONFIG.endpoint){
+      el.className='save-state err';
+      el.textContent='Нәтиже есептелді (сервер әлі қосылмаған).';
+      return;
+    }
+    el.className='save-state';
+    el.innerHTML='<span class="spin"></span>Жауабыңыз сақталуда…';
+    var body=Object.keys(payload).map(function(k){
+      return encodeURIComponent(k)+'='+encodeURIComponent(payload[k]);}).join('&');
+    fetch(window.CONFIG.endpoint,{method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:body})
+      .then(function(){el.className='save-state ok';el.textContent='✓ Жауабыңыз сәтті сақталды. Қатысқаныңызға рақмет!';})
+      .catch(function(){el.className='save-state err';el.textContent='Нәтиже есептелді, бірақ сақтауда ақау болды. Интернетті тексеріп, бетті қайта ашып көріңіз.';});
+  }
+})();
+</script>
+</body>
+</html>
